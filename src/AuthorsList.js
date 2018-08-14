@@ -28,7 +28,7 @@ class AuthorsList extends Component {
     const authorCards = this.state.filteredAuthors.map(author => (
       <AuthorCard key={author.first_name + author.last_name} author={author} />
     ));
-
+    console.log('hehe');
     return (
       <div className="authors">
         <h3>Authors</h3>

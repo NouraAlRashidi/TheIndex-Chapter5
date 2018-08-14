@@ -7,6 +7,8 @@ import Sidebar from "./Sidebar";
 import Loading from "./Loading";
 import AuthorsList from "./AuthorsList";
 import AuthorDetail from "./AuthorDetail";
+import BookList from "./BookList";
+
 
 const instance = axios.create({
   baseURL: "https://the-index-api.herokuapp.com"
@@ -17,12 +19,17 @@ class App extends Component {
     super(props);
     this.state = {
       authors: [],
-      loading: true
+      loading: true,
+      books: [],
     };
   }
 
   fetchAllAuthors() {
     return instance.get("/api/authors/").then(res => res.data);
+  }
+
+  fetchAllBooks() {
+    return instance.get("/api/books/").then(res => res.data);
   }
 
   componentDidMount() {
@@ -34,6 +41,16 @@ class App extends Component {
         })
       )
       .catch(err => console.error(err));
+
+
+      this.fetchAllBooks()
+        .then(books =>
+          this.setState({
+            books: books,
+            loading: false
+          })
+        )
+        .catch(err => console.error(err));
   }
 
   getView() {
@@ -43,13 +60,23 @@ class App extends Component {
       return (
         <Switch>
           <Redirect exact from="/" to="/authors" />
+          {/* If exact is removed, it will take any URL that starts with a backslash
+            then change it to authors, then go back again in an infinite loop since it does not stick to one URL
+             */}
           <Route path="/authors/:authorID" component={AuthorDetail} />
           <Route
-            path="/authors/"
+            path="/authors"
             render={props => (
               <AuthorsList {...props} authors={this.state.authors} />
-            )}
-          />
+            )}/>
+            <Route path = "/books/:bookColor" render= {props => <BookList {...props} books = {this.state.books}/>}/>
+
+            <Route
+              path="/books"
+              render={props => (
+                <BookList {...props} books={this.state.books} />
+              )}/>
+
         </Switch>
       );
     }
